@@ -37,7 +37,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.helloandroid.data.LoginData
+import com.example.helloandroid.frontend.CreateUserPage
 import com.example.helloandroid.frontend.Homepage
+import com.example.helloandroid.respon.LoginRespon
+import com.example.helloandroid.service.LoginService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -67,6 +71,9 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(route = "pagetwo") {
                     Homepage(navController)
+                }
+                composable(route = "createuserpage") {
+                    CreateUserPage(navController)
                 }
             }
         }
