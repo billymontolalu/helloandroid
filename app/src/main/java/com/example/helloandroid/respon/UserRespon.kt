@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 class UserRespon {
     var id: Int = 0
-    var userName : String = ""
+    var username : String = ""
     var email : String = ""
     var provider : String = ""
     var confirmed: String = ""
