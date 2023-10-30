@@ -141,6 +141,11 @@ fun Homepage(navController: NavController, context: Context = LocalContext.curre
                             }) {
                                 Text("Delete")
                             }
+                            ElevatedButton(onClick = {
+                                navController.navigate("edituserpage/" + user.id + "/" + user.username)
+                            }) {
+                                Text("Edit")
+                            }
                         }
                     }
                 }
