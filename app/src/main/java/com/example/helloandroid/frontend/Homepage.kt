@@ -10,9 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -113,38 +116,59 @@ fun Homepage(navController: NavController, context: Context = LocalContext.curre
             LazyColumn{
                 listUser.forEach { user ->
                     item {
-                        Row (modifier = Modifier.padding(10.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                        Row (modifier = Modifier
+                            .padding(10.dp)
+                            .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Text(text = user.username)
-                            ElevatedButton(onClick = {
-                                val retrofit = Retrofit.Builder()
-                                    .baseUrl(baseUrl)
-                                    .addConverterFactory(GsonConverterFactory.create())
-                                    .build()
-                                    .create(UserService::class.java)
-                                val call = retrofit.delete(user.id)
-                                call.enqueue(object : Callback<UserRespon>{
-                                    override fun onResponse(call: Call<UserRespon>, response: Response<UserRespon>) {
-                                        print(response.code())
-                                        if(response.code() == 200){
-                                        }else if(response.code() == 400){
-                                            print("error login")
-                                            var toast = Toast.makeText(context, "Username atau password salah", Toast.LENGTH_SHORT).show()
+                            Row {
+                                ElevatedButton(onClick = {
+                                    val retrofit = Retrofit.Builder()
+                                        .baseUrl(baseUrl)
+                                        .addConverterFactory(GsonConverterFactory.create())
+                                        .build()
+                                        .create(UserService::class.java)
+                                    val call = retrofit.delete(user.id)
+                                    call.enqueue(object : Callback<UserRespon> {
+                                        override fun onResponse(
+                                            call: Call<UserRespon>,
+                                            response: Response<UserRespon>
+                                        ) {
+                                            print(response.code())
+                                            if (response.code() == 200) {
+                                                listUser.remove(user)
+                                            } else if (response.code() == 400) {
+                                                print("error login")
+                                                var toast = Toast.makeText(
+                                                    context,
+                                                    "Username atau password salah",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
 
+                                            }
                                         }
-                                    }
 
-                                    override fun onFailure(call: Call<UserRespon>, t: Throwable) {
-                                        print(t.message)
-                                    }
+                                        override fun onFailure(
+                                            call: Call<UserRespon>,
+                                            t: Throwable
+                                        ) {
+                                            print(t.message)
+                                        }
 
-                                })
-                            }) {
-                                Text("Delete")
-                            }
-                            ElevatedButton(onClick = {
-                                navController.navigate("edituserpage/" + user.id + "/" + user.username)
-                            }) {
-                                Text("Edit")
+                                    })
+                                }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete", modifier = Modifier.width(20.dp))
+                                    Box(modifier = Modifier.padding(horizontal = 2.dp))
+                                    Text("Delete")
+                                }
+                                Box(modifier = Modifier.padding(horizontal = 5.dp))
+                                ElevatedButton(onClick = {
+                                    navController.navigate("edituserpage/" + user.id + "/" + user.username)
+                                }) {
+                                    Icon(Icons.Default.Edit, contentDescription = "Edit", modifier = Modifier.width(20.dp))
+                                    Box(modifier = Modifier.padding(horizontal = 2.dp))
+                                    Text("Edit")
+
+                                }
                             }
                         }
                     }

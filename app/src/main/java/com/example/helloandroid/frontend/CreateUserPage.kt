@@ -80,12 +80,12 @@ fun CreateUserPage(navController: NavController, context: Context = LocalContext
                     ) {
                         print(response.code())
                         if (response.code() == 200) {
-
+                            navController.navigate("pagetwo")
                         } else if (response.code() == 400) {
-                            print("error login")
+                            print(response.raw())
                             var toast = Toast.makeText(
                                 context,
-                                "Username atau password salah",
+                                response.message(),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
