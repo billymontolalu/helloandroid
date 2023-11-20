@@ -12,27 +12,39 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -45,6 +57,7 @@ import com.example.helloandroid.frontend.EditUserPage
 import com.example.helloandroid.frontend.Homepage
 import com.example.helloandroid.respon.LoginRespon
 import com.example.helloandroid.service.LoginService
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -53,6 +66,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : ComponentActivity() {
 
+
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -67,24 +82,97 @@ class MainActivity : ComponentActivity() {
             }else{
                 startDestination = "pagetwo"
             }
+            val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+            val scope = rememberCoroutineScope()
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    ModalDrawerSheet {
+                        Text("Sewa Camera", modifier = Modifier.padding(16.dp))
+                        Divider()
+                        NavigationDrawerItem(
+                            label = { Text(text = "Add User") },
+                            selected = false,
+                            onClick = {
+                                navController.navigate("createuserpage")
+                                scope.launch {
+                                    drawerState.close()
+                                }
 
-            NavHost(navController, startDestination = startDestination) {
-                composable(route = "greeting") {
-                    Greeting(navController)
+                            }
+                        )
+                        // ...other drawer items
+                    }
                 }
-                composable(route = "pagetwo") {
-                    Homepage(navController)
-                }
-                composable(route = "createuserpage") {
-                    CreateUserPage(navController)
-                }
-                composable(
-                    route = "edituserpage/{userid}/{username}",
-                    ) {backStackEntry ->
+            ) {
+                Scaffold(
+                    topBar = {
+                        TopAppBar(
+                            title = { Text(text = "Sewa Camera") },
+                            navigationIcon = {
+                                IconButton(onClick = {
+                                    scope.launch {
+                                        drawerState.apply {
+                                            if (isClosed) open() else close()
+                                        }
+                                    }
+                                }) {
+                                    Icon(imageVector = Icons.Outlined.Menu, contentDescription = "")
+                                }
+                            }
+                        )},
+                    floatingActionButton = {
+                        ExtendedFloatingActionButton(
+                            text = { Text("Show drawer") },
+                            icon = { Icon(Icons.Filled.Add, contentDescription = "") },
+                            onClick = {
+                                scope.launch {
+                                    drawerState.apply {
+                                        if (isClosed) open() else close()
+                                    }
+                                }
+                            }
+                        )
+                    }
+                ) { contentPadding ->
+                    // Screen content
+                    NavHost(navController, startDestination = startDestination, modifier = Modifier.padding(contentPadding)) {
+                        composable(route = "greeting") {
+                            Greeting(navController)
+                        }
+                        composable(route = "pagetwo") {
+                            Homepage(navController)
+                        }
+                        composable(route = "createuserpage") {
+                            CreateUserPage(navController)
+                        }
+                        composable(
+                            route = "edituserpage/{userid}/{username}",
+                            ) {backStackEntry ->
 
-                    EditUserPage(navController, backStackEntry.arguments?.getString("userid"), backStackEntry.arguments?.getString("username"))
+                            EditUserPage(navController, backStackEntry.arguments?.getString("userid"), backStackEntry.arguments?.getString("username"))
+                        }
+                    }
                 }
             }
+
+//            NavHost(navController, startDestination = startDestination) {
+//                composable(route = "greeting") {
+//                    Greeting(navController)
+//                }
+//                composable(route = "pagetwo") {
+//                    Homepage(navController)
+//                }
+//                composable(route = "createuserpage") {
+//                    CreateUserPage(navController)
+//                }
+//                composable(
+//                    route = "edituserpage/{userid}/{username}",
+//                    ) {backStackEntry ->
+//
+//                    EditUserPage(navController, backStackEntry.arguments?.getString("userid"), backStackEntry.arguments?.getString("username"))
+//                }
+//            }
         }
     }
 }
