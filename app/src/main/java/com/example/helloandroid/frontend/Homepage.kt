@@ -56,6 +56,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Composable
 fun Homepage(navController: NavController, context: Context = LocalContext.current){
     //var listUser: List<UserRespon> = remember
+    var username by remember { mutableStateOf(TextFieldValue("")) }
 
     val listUser = remember { mutableStateListOf<UserRespon>()}
     //var listUser: List<UserRespon> by remember { mutableStateOf(List<UserRespon>()) }
@@ -65,33 +66,39 @@ fun Homepage(navController: NavController, context: Context = LocalContext.curre
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(UserService::class.java)
-    val call = retrofit.getData()
-    call.enqueue(object : Callback<List<UserRespon>> {
-        override fun onResponse(
-            call: Call<List<UserRespon>>,
-            response: Response<List<UserRespon>>
-        ) {
-            if (response.code() == 200) {
-                //kosongkan list User terlebih dahulu
-                listUser.clear()
-                response.body()?.forEach{ userRespon ->
-                    listUser.add(userRespon)
+
+    fun loadData(search: String?){
+        val call = retrofit.getData(search)
+        call.enqueue(object : Callback<List<UserRespon>> {
+            override fun onResponse(
+                call: Call<List<UserRespon>>,
+                response: Response<List<UserRespon>>
+            ) {
+                if (response.code() == 200) {
+                    //kosongkan list User terlebih dahulu
+                    listUser.clear()
+                    response.body()?.forEach{ userRespon ->
+                        listUser.add(userRespon)
+                    }
+                } else if (response.code() == 400) {
+                    print("error login")
+                    var toast = Toast.makeText(
+                        context,
+                        "Username atau password salah",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-            } else if (response.code() == 400) {
-                print("error login")
-                var toast = Toast.makeText(
-                    context,
-                    "Username atau password salah",
-                    Toast.LENGTH_SHORT
-                ).show()
             }
-        }
 
-        override fun onFailure(call: Call<List<UserRespon>>, t: Throwable) {
-            print(t.message)
-        }
+            override fun onFailure(call: Call<List<UserRespon>>, t: Throwable) {
+                print(t.message)
+            }
 
-    })
+        })
+    }
+
+    loadData(null)
+
     Scaffold (
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -115,6 +122,12 @@ fun Homepage(navController: NavController, context: Context = LocalContext.curre
             .padding(innerPadding),
             ) {
             LazyColumn{
+                item { Row {
+                    OutlinedTextField(value = username, onValueChange = { newText ->
+                        username = newText
+                        loadData(username.text)
+                    } )
+                } }
                 listUser.forEach { user ->
                     item {
                         Row (modifier = Modifier
