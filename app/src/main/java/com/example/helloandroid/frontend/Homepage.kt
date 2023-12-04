@@ -68,7 +68,7 @@ fun Homepage(navController: NavController, context: Context = LocalContext.curre
         .create(UserService::class.java)
 
     fun loadData(search: String?){
-        val call = retrofit.getData(search)
+        val call = retrofit.getData(search, "*", "username:desc")
         call.enqueue(object : Callback<List<UserRespon>> {
             override fun onResponse(
                 call: Call<List<UserRespon>>,
@@ -79,6 +79,8 @@ fun Homepage(navController: NavController, context: Context = LocalContext.curre
                     listUser.clear()
                     response.body()?.forEach{ userRespon ->
                         listUser.add(userRespon)
+                        val x = userRespon.prodi?.namaProdi
+                        val y = ""
                     }
                 } else if (response.code() == 400) {
                     print("error login")
@@ -133,7 +135,7 @@ fun Homepage(navController: NavController, context: Context = LocalContext.curre
                         Row (modifier = Modifier
                             .padding(10.dp)
                             .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = user.username)
+                            Text(text = user.username!!)
                             Row {
                                 ElevatedButton(onClick = {
                                     val retrofit = Retrofit.Builder()
@@ -141,7 +143,7 @@ fun Homepage(navController: NavController, context: Context = LocalContext.curre
                                         .addConverterFactory(GsonConverterFactory.create())
                                         .build()
                                         .create(UserService::class.java)
-                                    val call = retrofit.delete(user.id)
+                                    val call = retrofit.delete(user.id!!)
                                     call.enqueue(object : Callback<UserRespon> {
                                         override fun onResponse(
                                             call: Call<UserRespon>,

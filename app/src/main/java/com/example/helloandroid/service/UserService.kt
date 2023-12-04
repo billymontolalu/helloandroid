@@ -13,7 +13,11 @@ import retrofit2.http.Query
 
 interface UserService {
     @GET("users")
-    fun getData(@Query("filters[username][\$contains]") search: String?): Call<List<UserRespon>>
+    fun getData(
+        @Query("filters[username][\$contains]") search: String?,
+        @Query("populate") populate: String?,
+        @Query("sort[0]") sort: String?
+    ): Call<List<UserRespon>>
 
     @DELETE("users/{id}")
     fun delete(@Path("id") id: Int): Call<UserRespon>
