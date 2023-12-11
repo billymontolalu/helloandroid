@@ -46,6 +46,14 @@ import com.example.helloandroid.respon.UserRespon
 import com.example.helloandroid.service.LoginService
 import com.example.helloandroid.service.RegisterService
 import com.example.helloandroid.service.UserService
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.column.columnChart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.core.entry.FloatEntry
+import com.patrykandpatrick.vico.core.entry.entryModelOf
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -56,7 +64,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 @Composable
 fun Homepage(navController: NavController, context: Context = LocalContext.current){
     //var listUser: List<UserRespon> = remember
+    val chartEntryModel = entryModelOf(4f, 12f, 8f, 16f)
+    val dataPoint = arrayListOf<FloatEntry>()
+    val modelProducer = ChartEntryModelProducer()
+    val dataSetForModel = remember { mutableStateListOf(listOf<FloatEntry>()) }
     var username by remember { mutableStateOf(TextFieldValue("")) }
+
+    dataPoint.add(FloatEntry(3f, 5f))
+    dataPoint.add(FloatEntry(2f, 7f))
+    dataSetForModel.add(dataPoint)
+    modelProducer.setEntries(dataSetForModel)
 
     val listUser = remember { mutableStateListOf<UserRespon>()}
     //var listUser: List<UserRespon> by remember { mutableStateOf(List<UserRespon>()) }
@@ -123,6 +140,13 @@ fun Homepage(navController: NavController, context: Context = LocalContext.curre
             .fillMaxSize()
             .padding(innerPadding),
             ) {
+            Chart(
+                chart = lineChart(),
+//                model = chartEntryModel,
+                chartModelProducer = modelProducer,
+                startAxis = rememberStartAxis(),
+                bottomAxis = rememberBottomAxis(),
+            )
             LazyColumn{
                 item { Row {
                     OutlinedTextField(value = username, onValueChange = { newText ->
